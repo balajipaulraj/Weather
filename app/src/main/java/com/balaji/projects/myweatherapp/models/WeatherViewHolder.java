@@ -2,6 +2,7 @@ package com.balaji.projects.myweatherapp.models;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
     public TextView itemHumidity;
     public TextView itemIcon;
     public TextView readmore;
+    public ImageView share;
     public View lineView;
 
 
@@ -31,6 +33,7 @@ public class WeatherViewHolder extends RecyclerView.ViewHolder {
         this.itemPressure = (TextView) view.findViewById(R.id.itemPressure);
         this.itemHumidity = (TextView) view.findViewById(R.id.itemHumidity);
         this.itemIcon = (TextView) view.findViewById(R.id.itemIcon);
+        this.share = (ImageView) view.findViewById(R.id.iv_share);
         this.lineView = view.findViewById(R.id.lineView);
 
         readmore.setOnClickListener(new View.OnClickListener() {

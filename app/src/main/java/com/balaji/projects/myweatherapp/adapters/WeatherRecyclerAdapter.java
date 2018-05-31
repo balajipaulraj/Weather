@@ -1,6 +1,7 @@
 package com.balaji.projects.myweatherapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
@@ -21,6 +22,10 @@ import com.balaji.projects.myweatherapp.activities.MainActivity;
 import com.balaji.projects.myweatherapp.models.Weather;
 import com.balaji.projects.myweatherapp.models.WeatherViewHolder;
 import com.balaji.projects.myweatherapp.utils.UnitConvertor;
+
+import org.apache.http.protocol.HTTP;
+
+
 /**
  * Created by Balaji on 30-May-18.
  */
@@ -43,9 +48,9 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherViewHold
 
     @Override
     public void onBindViewHolder(WeatherViewHolder customViewHolder, int i) {
-        Weather weatherItem = itemList.get(i);
+        final Weather weatherItem = itemList.get(i);
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Temperature
         float temperature = UnitConvertor.convertTemperature(Float.parseFloat(weatherItem.getTemperature()), sp);
@@ -68,7 +73,7 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherViewHold
         wind = UnitConvertor.convertWind(wind, sp);
 
         // Pressure
-        double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(weatherItem.getPressure()), sp);
+        final double pressure = UnitConvertor.convertPressure((float) Double.parseDouble(weatherItem.getPressure()), sp);
 
         TimeZone tz = TimeZone.getDefault();
         String defaultDateFormat = context.getResources().getStringArray(R.array.dateFormatsValues)[0];
@@ -127,6 +132,22 @@ public class WeatherRecyclerAdapter extends RecyclerView.Adapter<WeatherViewHold
         customViewHolder.itemPressure.setText(context.getString(R.string.pressure) + ": " + new DecimalFormat("0.0").format(pressure) + " " +
                 MainActivity.localize(sp, context, "pressureUnit", "hPa"));
         customViewHolder.itemHumidity.setText(context.getString(R.string.humidity) + ": " + weatherItem.getHumidity() + " %");
+
+        final String finalDateString = dateString;
+        final double finalWind = wind;
+        customViewHolder.share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent shareIntent = new Intent("android.intent.action.SEND");
+                shareIntent.setType(HTTP.PLAIN_TEXT_TYPE);
+                shareIntent.putExtra("android.intent.extra.SUBJECT", finalDateString);
+                shareIntent.putExtra("android.intent.extra.TEXT", context.getString(R.string.wind) + ": " +
+                        UnitConvertor.getBeaufortName((int) finalWind) + " " + MainActivity.getWindDirectionString(sp, context, weatherItem)+", "+context.getString(R.string.humidity) + ": " + weatherItem.getHumidity() + " %"
+                        +", "+context.getString(R.string.pressure) + ": " + new DecimalFormat("0.0").format(pressure) + " " +
+                        MainActivity.localize(sp, context, "pressureUnit", "hPa"));
+                context.startActivity(Intent.createChooser(shareIntent, "Sharing Weather Report"));
+            }
+        });
     }
 
     @Override
